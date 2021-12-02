@@ -1,11 +1,10 @@
 package com.example.individualassignmentux
 
-import android.animation.ValueAnimator
 import android.os.Bundle
-import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -15,9 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.individualassignmentux.ui.theme.IndividualAssignmentUXTheme
@@ -29,7 +26,7 @@ class MainActivity : ComponentActivity() {
             IndividualAssignmentUXTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    MyApp(App.game.gameState)
+                    MyApp()
                 }
             }
         }
@@ -37,13 +34,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MyApp(onValueChangeListener: NumberPicker.OnValueChangeListener) {
+private fun MyApp() {
     val currentWord = Word("Further")
-    StatusMessage(message = "State is: ")
     MakeKeyboard(currentWord)}
 
 @Composable
 private fun MakeKeyboard(word: Word) {
+    var status: GameState by remember {
+        mutableStateOf(App.game.gameState)
+    }
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(1f)) {
+        if (status == GameState.SPIN) {
+            Text(text = "We are ready for your spin!", fontSize = 30.sp, color = Color.Green)
+        }
+        else {
+            Text(text = "Please guess a consonant", fontSize = 30.sp, color = Color.Green)
+        }
+    }
     Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
         .padding(5.dp)
         .fillMaxSize(1f)) {
@@ -51,9 +58,7 @@ private fun MakeKeyboard(word: Word) {
         Button(onClick = {
                          if (App.game.gameState == GameState.SPIN) {
                              App.game.gameState = GameState.GUESS
-                         }
-                         else {
-                             App.game.gameState = GameState.SPIN
+                             status = App.game.gameState
                          }
         },
             contentPadding = PaddingValues(
@@ -93,7 +98,7 @@ private fun MakeKeyboard(word: Word) {
 }
 
 @Composable
-fun MakeLetter(letter: String) {
+fun MakeLetter(letter: String, gameState: GameState) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
         .border(2.dp, Color.Green)
         .width(35.dp)
@@ -124,16 +129,6 @@ fun Letter(letter: Letter) {
         } else {
             Text(text = "_")
         }
-    }
-}
-
-@Composable
-fun StatusMessage(message: String) {
-        var status by remember {
-            mutableStateOf(App.game.gameState)
-        }
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(1f)) {
-        Text(text = message + App.game.gameState.toString(), fontSize = 30.sp, color = Color.Green)
     }
 }
 
